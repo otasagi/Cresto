@@ -115,6 +115,26 @@ fun SettingsScreen() {
                     Column(modifier = Modifier.fillMaxWidth()) {
                         ConfigEntryItem(
                             color = harmonize(Blue500),
+                            icon = painterResource(R.drawable.ic_cloud_sync),
+                            title = stringResource(R.string.webdav_sync),
+                            onClick = {
+                                context.startActivity(
+                                    SettingsActivity.createIntent(
+                                        context,
+                                        SettingsDestination.WEBDAV_SYNC
+                                    )
+                                )
+                            }
+                        )
+                    }
+                }
+                VGap()
+            }
+            item {
+                ConfigContainer(backgroundColor = hierarchicalSurfaceColor) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        ConfigEntryItem(
+                            color = harmonize(Blue500),
                             icon = painterResource(R.drawable.ic_twotone_image),
                             title = stringResource(R.string.appearance),
                             onClick = {

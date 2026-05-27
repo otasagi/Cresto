@@ -40,6 +40,7 @@ object SettingsManager {
     private const val DEFAULT_AI_API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
     private const val DEFAULT_AI_MODEL = "glm-4-flash"
     private const val KEY_APP_ICON = "app_icon"
+    private const val KEY_WEBDAV_SYNC_ENABLED = "webdav_sync_enabled"
 
     private val defaultThemePrimaryColor = Blue500.toArgb()
 
@@ -80,6 +81,8 @@ object SettingsManager {
         mutableStateOf(mmkv.decodeBool(KEY_EXTRACT_SCREEN_QUICK_TILE_ENABLED, false))
     val isAutoAddToSystemCalendarState =
         mutableStateOf(mmkv.decodeBool(KEY_AUTO_ADD_TO_SYSTEM_CALENDAR, false))
+    val isWebDavSyncEnabledState =
+        mutableStateOf(mmkv.decodeBool(KEY_WEBDAV_SYNC_ENABLED, false))
     val appIconState = mutableStateOf(
         mmkv.decodeString(KEY_APP_ICON, AppIconManager.AppIcon.DEFAULT.name)
             ?.let { name ->
@@ -245,6 +248,13 @@ object SettingsManager {
         set(value) {
             mmkv.encode(KEY_AUTO_ADD_TO_SYSTEM_CALENDAR, value)
             isAutoAddToSystemCalendarState.value = value
+        }
+
+    var isWebDavSyncEnabled: Boolean
+        get() = mmkv.decodeBool(KEY_WEBDAV_SYNC_ENABLED, false)
+        set(value) {
+            mmkv.encode(KEY_WEBDAV_SYNC_ENABLED, value)
+            isWebDavSyncEnabledState.value = value
         }
 
     var appIcon: AppIconManager.AppIcon

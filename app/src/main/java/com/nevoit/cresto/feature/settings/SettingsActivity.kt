@@ -21,6 +21,7 @@ enum class SettingsDestination(val value: String) {
     AI("ai"),
     DATA_STORAGE("data_storage"),
     GENERAL("general"),
+    WEBDAV_SYNC("webdav_sync"),
     ABOUT("about"),
     CREDITS("credits");
 
@@ -50,7 +51,6 @@ class SettingsActivity : ComponentActivity() {
         val destination = SettingsDestination.fromValue(
             intent.getStringExtra(EXTRA_SETTINGS_DESTINATION)
         )
-
         setContent {
             GlasenseTheme {
                 val overscrollFactory = rememberOffsetOverscrollFactory(
@@ -66,6 +66,7 @@ class SettingsActivity : ComponentActivity() {
                         SettingsDestination.AI -> AIScreen()
                         SettingsDestination.DATA_STORAGE -> DataStorageScreen()
                         SettingsDestination.GENERAL -> GeneralScreen()
+                        SettingsDestination.WEBDAV_SYNC -> SyncScreen()
                         SettingsDestination.ABOUT -> AboutScreen()
                         SettingsDestination.CREDITS -> CreditsScreen()
                     }

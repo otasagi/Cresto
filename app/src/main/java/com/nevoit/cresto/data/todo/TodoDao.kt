@@ -11,6 +11,7 @@ import com.nevoit.cresto.data.statistics.DailyStat
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 // Data Access Object (DAO) for the todo_items table.
 @Dao
@@ -257,4 +258,65 @@ interface TodoDao {
         """
     )
     fun searchTodosWithSubTodos(query: String): Flow<List<TodoItemWithSubTodos>>
+
+    // ── syncId queries ──
+
+    @Transaction
+    @Query("SELECT * FROM todo_items WHERE syncId = :syncId")
+    suspend fun getTodoWithSubTodosBySyncId(syncId: String): TodoItemWithSubTodos?
+
+    @Query("SELECT syncId FROM todo_items")
+    suspend fun getAllSyncIds(): List<String>
+
+    @Query(
+        """
+        UPDATE todo_items SET
+            title = :title, dueDate = :dueDate, isCompleted = :isCompleted,
+            completedDateTime = :completedDateTime, flag = :flag, notes = :notes,
+            startTime = :startTime, endTime = :endTime,
+            reminderMode = :reminderMode, reminderOffsetMinutes = :reminderOffsetMinutes,
+            reminderDayOffset = :reminderDayOffset, reminderTime = :reminderTime,
+            reminderPersistent = :reminderPersistent, reminderStrong = :reminderStrong,
+            updatedAt = :updatedAt
+        WHERE syncId = :syncId
+        """
+    )
+    suspend fun updateBySyncId(
+        syncId: String,
+        title: String,
+        dueDate: LocalDate?,
+        isCompleted: Boolean,
+        completedDateTime: LocalDateTime?,
+        flag: Int,
+        notes: String,
+        startTime: LocalTime?,
+        endTime: LocalTime?,
+        reminderMode: TodoReminderMode?,
+        reminderOffsetMinutes: Int?,
+        reminderDayOffset: Int?,
+        reminderTime: LocalTime?,
+        reminderPersistent: Boolean,
+        reminderStrong: Boolean,
+        updatedAt: LocalDateTime
+    ): Int
+
+    @Query("DELETE FROM todo_items WHERE syncId IN (:syncIds)")
+    suspend fun deleteBySyncIds(syncIds: List<String>)
+
+    @Query("SELECT syncId FROM todo_items WHERE syncId IN (:syncIds)")
+    suspend fun filterExistingSyncIds(syncIds: Collection<String>): List<String>
+
+    @Transaction
+    @Query("SELECT * FROM todo_items WHERE syncId IN (:syncIds)")
+    suspend fun getTodosWithSubTodosBySyncIds(syncIds: List<String>): List<TodoItemWithSubTodos>
+
+    @Transaction
+    @Query("SELECT * FROM todo_items ORDER BY updatedAt ASC")
+    suspend fun getAllTodosWithSubTodosSnapshotOrderedByUpdatedAt(): List<TodoItemWithSubTodos>
+
+    @Query("SELECT id FROM todo_items WHERE syncId = :syncId")
+    suspend fun getLocalIdBySyncId(syncId: String): Int?
+
+    @Query("DELETE FROM sub_todo_items WHERE parentId = :parentId")
+    suspend fun deleteSubTodosByParentId(parentId: Int)
 }

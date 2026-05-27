@@ -308,4 +308,34 @@
     <string name="insights_days_format">%1$d 天</string>
     <string name="insights_no_pending">暂无</string>
     <string name="insights_empty_trend">还没有完成记录</string>
+
+    <!-- WebDAV Sync -->
+    <string name="webdav_sync">WebDAV 同步</string>
+    <string name="webdav_sync_config">服务器配置</string>
+    <string name="webdav_sync_summary">与自有 WebDAV 服务器双向同步待办</string>
+    <string name="webdav_server_url" translatable="false">服务器 URL</string>
+    <string name="webdav_username">用户名</string>
+    <string name="webdav_password">密码</string>
+    <string name="webdav_test_connection">测试连接</string>
+    <string name="webdav_connection_success">连接成功</string>
+    <string name="webdav_connection_failed">连接失败</string>
+    <string name="webdav_sync_now">立即同步</string>
+    <string name="webdav_last_sync">上次同步</string>
+    <string name="webdav_never">从未</string>
+    <string name="webdav_syncing">同步中…</string>
+    <string name="webdav_sync_success">同步完成</string>
+    <string name="webdav_sync_failed">同步失败</string>
+    <string name="webdav_conflicts_title">同步冲突</string>
+    <string name="webdav_conflicts_found">发现 %1$d 个冲突</string>
+    <string name="webdav_no_conflicts">无冲突</string>
+    <string name="webdav_accept_local">使用本地版本</string>
+    <string name="webdav_accept_remote">使用远程版本</string>
+    <string name="webdav_clear_remote_data">清除远程数据</string>
+    <string name="webdav_clear_remote_confirm">确定要删除服务器上所有同步数据吗？</string>
+    <string name="webdav_items_synced">已同步 %1$d 项</string>
+    <string name="webdav_auto_sync">自动同步</string>
+    <string name="confirm">确认</string>
+    <string name="testing">测试中…</string>
+    <string name="waiting_for_network">等待网络连接</string>
+    <string name="sync">同步</string>
 </resources>

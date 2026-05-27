@@ -4,6 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.util.UUID
 
 @Entity(
     tableName = "sub_todo_items",
@@ -15,11 +16,15 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["parentId"])]
+    indices = [
+        Index(value = ["parentId"]),
+        Index(value = ["syncId"])
+    ]
 )
 data class SubTodoItem(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val syncId: String = UUID.randomUUID().toString(),
     val parentId: Int,
     val description: String,
     val isCompleted: Boolean = false

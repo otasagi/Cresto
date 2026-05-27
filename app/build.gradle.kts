@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.androidx.compose.animation.graphics)
     implementation(libs.androidx.compose.foundation.layout)
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -112,6 +113,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.mmkv)
     implementation(libs.shapes)
@@ -122,6 +124,9 @@ dependencies {
     implementation(libs.aboutlibraries.compose.core)
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+
+    implementation(libs.okhttp.core)
+    testImplementation(libs.okhttp.mockwebserver)
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.androidx.compose)

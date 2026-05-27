@@ -3,12 +3,19 @@ package com.nevoit.cresto.feature.home
 import android.graphics.BlurMaskFilter
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Row
@@ -29,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Rect
@@ -73,10 +82,14 @@ import com.kyant.backdrop.effects.lens
 import com.kyant.backdrop.highlight.Highlight
 import com.kyant.shapes.Capsule
 import com.nevoit.cresto.R
+import com.nevoit.cresto.data.sync.SyncManager
+import com.nevoit.cresto.data.sync.SyncStatus
 import com.nevoit.cresto.data.todo.TodoViewModel
+import com.nevoit.cresto.feature.settings.util.SettingsManager
 import com.nevoit.cresto.theme.AppButtonColors
 import com.nevoit.cresto.theme.AppColors
 import com.nevoit.cresto.theme.LocalGlasenseSettings
+import com.nevoit.cresto.theme.harmonize
 import com.nevoit.cresto.theme.isAppInDarkTheme
 import com.nevoit.cresto.ui.components.glasense.GlasenseButtonAdaptable
 import com.nevoit.cresto.ui.components.glasense.GlasenseButtonToolBar
@@ -87,6 +100,8 @@ import com.nevoit.cresto.ui.components.glasense.material.MaterialRecipes
 import com.nevoit.cresto.ui.components.glasense.material.rememberMaterialRenderEffect
 import com.nevoit.glasense.core.component.Icon
 import com.nevoit.glasense.core.component.Text
+import com.nevoit.glasense.theme.tokens.Green500
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -95,11 +110,13 @@ fun BoxScope.HomeTopAppBar(
     menuItems: List<GlasenseMenuItem>,
     isTitleVisible: Boolean,
     backdrop: Backdrop,
-    viewModel: TodoViewModel
+    viewModel: TodoViewModel,
+    syncManager: SyncManager? = null
 ) {
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
     val selectedItemCount by viewModel.selectedItemCount.collectAsState()
+    val syncStatusState by (syncManager?.syncStatus?.collectAsState() ?: remember { mutableStateOf(SyncStatus.Idle) })
     val isSelectionModeActive by viewModel.isSelectionModeActive.collectAsState()
     val isSearchBoxOpen by viewModel.isSearchBoxOpen.collectAsState()
     val searchQuery by viewModel.searchQuery.collectAsState()
@@ -302,10 +319,24 @@ fun BoxScope.HomeTopAppBar(
                         }
                     }
                 }
-                GlasenseButtonAdaptable(
-                    enabled = true,
-                    shape = CircleShape,
-                    onClick = { viewModel.showBottomSheet() },
+                Row(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val isSyncEnabled by SettingsManager.isWebDavSyncEnabledState
+                    if (isSyncEnabled && syncManager != null) {
+                        SyncStatusIcon(
+                            syncStatusState = syncStatusState,
+                            onSyncClick = { syncManager.onDataChanged() },
+                            topBarAlpha = topBarAlphaAnimation.value,
+                            targetBlurRadius = targetBlurRadius,
+                            topBarBlur = topBarBlurAnimation.value
+                        )
+                    }
+                    GlasenseButtonAdaptable(
+                        enabled = true,
+                        shape = CircleShape,
+                        onClick = { viewModel.showBottomSheet() },
                     modifier = Modifier
                         .graphicsLayer {
                             alpha = 1 - topBarAlphaAnimation.value
@@ -320,8 +351,7 @@ fun BoxScope.HomeTopAppBar(
                                 null
                             }
                         }
-                        .size(48.dp)
-                        .align(Alignment.TopEnd),
+                        .size(48.dp),
                     colors = AppButtonColors.action(),
                     width = { 48.dp },
                     height = { 48.dp }
@@ -332,6 +362,7 @@ fun BoxScope.HomeTopAppBar(
                         modifier = Modifier.width(32.dp)
                     )
                 }
+                } // Row end
             }
             if (isComposed) {
                 GlasenseButtonAdaptable(
@@ -548,5 +579,145 @@ fun BoxScope.HomeTopAppBar(
                 tint = AppColors.content.copy(alpha = 0.4f)
             )
         }
+    }
+}
+
+@Composable
+private fun SyncStatusIcon(
+    syncStatusState: SyncStatus,
+    onSyncClick: () -> Unit,
+    topBarAlpha: Float = 0f,
+    targetBlurRadius: Float = 0f,
+    topBarBlur: Float = 0f
+) {
+    var showGreenCheck by remember { mutableStateOf(false) }
+    var extendLoading by remember { mutableStateOf(false) }
+    var wasSyncing by remember { mutableStateOf(false) }
+
+    val rawIsSyncing = syncStatusState is SyncStatus.Syncing
+    if (rawIsSyncing) wasSyncing = true
+    if (!rawIsSyncing && wasSyncing && syncStatusState is SyncStatus.Success) {
+        wasSyncing = false
+        extendLoading = true
+    }
+
+    LaunchedEffect(syncStatusState) {
+        if (syncStatusState is SyncStatus.Success) {
+            delay(800)
+            extendLoading = false
+            showGreenCheck = true
+            delay(1800)
+            showGreenCheck = false
+        }
+    }
+
+    val isError = syncStatusState is SyncStatus.Error
+    val effectivelySyncing = rawIsSyncing || extendLoading
+    val showGreen = showGreenCheck
+
+    val targetIconRes = when {
+        isError -> R.drawable.ic_xmark_bold_circle_fill
+        effectivelySyncing -> R.drawable.ic_loading
+        else -> R.drawable.ic_checkmark
+    }
+
+    val targetTint = when {
+        isError -> AppColors.error
+        effectivelySyncing -> AppColors.primary
+        showGreen -> harmonize(Green500)
+        else -> AppColors.primary
+    }
+    val animatedTint = animateColorAsState(targetValue = targetTint, animationSpec = tween(500), label = "syncTint")
+
+    var lastRotation by remember { mutableFloatStateOf(0f) }
+    val syncRotation = if (effectivelySyncing) {
+        val transition = rememberInfiniteTransition(label = "syncSpin")
+        val animValue by transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable<Float>(
+                animation = tween<Float>(3000, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            ),
+            label = "rotation"
+        )
+        lastRotation = animValue
+        animValue
+    } else {
+        lastRotation
+    }
+
+    val haptic = LocalHapticFeedback.current
+    GlasenseButtonAdaptable(
+        enabled = true,
+        shape = CircleShape,
+        onClick = {
+            haptic.performHapticFeedback(HapticFeedbackType.ContextClick)
+            onSyncClick()
+        },
+        modifier = Modifier
+            .graphicsLayer {
+                alpha = 1 - topBarAlpha
+                val blurRadius = targetBlurRadius - topBarBlur
+                renderEffect = if (blurRadius > 0f) {
+                    BlurEffect(radiusX = blurRadius, radiusY = blurRadius, edgeTreatment = TileMode.Decal)
+                } else null
+            }
+            .size(48.dp),
+        colors = AppButtonColors.action(),
+        width = { 48.dp },
+        height = { 48.dp }
+    ) {
+        // Crossfade with blur between icon states
+        var displayedIcon by remember { mutableStateOf(targetIconRes) }
+        var outgoingIcon by remember { mutableStateOf<Int?>(null) }
+        val transitionProgress = remember { Animatable(1f) }
+        val isTransitioning = transitionProgress.value < 1f
+
+        LaunchedEffect(targetIconRes) {
+            if (targetIconRes != displayedIcon) {
+                outgoingIcon = displayedIcon
+                displayedIcon = targetIconRes
+                transitionProgress.snapTo(0f)
+                transitionProgress.animateTo(1f, tween(500))
+                outgoingIcon = null
+            }
+        }
+
+        val outgoingRes = outgoingIcon
+        if (isTransitioning && outgoingRes != null) {
+            val blurRadius = transitionProgress.value * 20f
+            Icon(
+                painter = painterResource(id = outgoingRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(28.dp)
+                    .then(if (outgoingRes == R.drawable.ic_loading) Modifier.rotate(syncRotation) else Modifier)
+                    .graphicsLayer {
+                        alpha = 1f - transitionProgress.value
+                        renderEffect = if (blurRadius > 0f) {
+                            BlurEffect(blurRadius, blurRadius, TileMode.Decal)
+                        } else null
+                    },
+                tint = animatedTint.value
+            )
+        }
+        Icon(
+            painter = painterResource(id = displayedIcon),
+            contentDescription = stringResource(R.string.webdav_sync),
+            modifier = Modifier
+                .width(28.dp)
+                .then(if (displayedIcon == R.drawable.ic_loading) Modifier.rotate(syncRotation) else Modifier)
+                .graphicsLayer {
+                    if (isTransitioning) {
+                        val inBlur = (1f - transitionProgress.value) * 20f
+                        alpha = transitionProgress.value
+                        renderEffect = if (inBlur > 0f) {
+                            BlurEffect(inBlur, inBlur, TileMode.Decal)
+                        } else null
+                    }
+                },
+            tint = animatedTint.value
+        )
     }
 }

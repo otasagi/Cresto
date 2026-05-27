@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+    <!-- Apple SF Symbols 7 icloud.fill, scaled within 32x32 -->
+    <path
+        android:fillColor="#FF000000"
+        android:fillAlpha="0.85"
+        android:pathData="M21.2742,22.4431C23.51,22.4431 25.2727,20.7731 25.2727,18.7136C25.2727,17.1643 24.3636,15.8283 22.9441,15.1975C22.9348,11.9133 20.5691,9.5569 17.5447,9.5569C15.5686,9.5569 14.1492,10.5959 13.24,11.8484C11.4216,11.3752 9.4641,12.7297 9.4084,14.7986C7.7385,15.0954 6.7273,16.6076 6.7273,18.4075C6.7273,20.5784 8.6384,22.4338 11.1804,22.4338Z"/>
+</vector>

@@ -319,4 +319,34 @@
     <string name="insights_days_format">%1$d d</string>
     <string name="insights_no_pending">None</string>
     <string name="insights_empty_trend">No completed todos yet</string>
+
+    <!-- WebDAV Sync -->
+    <string name="webdav_sync">WebDAV Sync</string>
+    <string name="webdav_sync_config">Server Configuration</string>
+    <string name="webdav_sync_summary">Sync with your own WebDAV server</string>
+    <string name="webdav_server_url" translatable="false">Server URL</string>
+    <string name="webdav_username">Username</string>
+    <string name="webdav_password">Password</string>
+    <string name="webdav_test_connection">Test Connection</string>
+    <string name="webdav_connection_success">Connection successful</string>
+    <string name="webdav_connection_failed">Connection failed</string>
+    <string name="webdav_sync_now">Sync Now</string>
+    <string name="webdav_last_sync">Last sync</string>
+    <string name="webdav_never">Never</string>
+    <string name="webdav_syncing">Syncing…</string>
+    <string name="webdav_sync_success">Sync completed</string>
+    <string name="webdav_sync_failed">Sync failed</string>
+    <string name="webdav_conflicts_title">Sync Conflicts</string>
+    <string name="webdav_conflicts_found">%1$d conflict(s) found</string>
+    <string name="webdav_no_conflicts">No conflicts</string>
+    <string name="webdav_accept_local">Use Local</string>
+    <string name="webdav_accept_remote">Use Remote</string>
+    <string name="webdav_clear_remote_data">Clear Remote Data</string>
+    <string name="webdav_clear_remote_confirm">Are you sure you want to delete all sync data from the server?</string>
+    <string name="webdav_items_synced">%1$d item(s) synced</string>
+    <string name="webdav_auto_sync">Auto Sync</string>
+    <string name="confirm">Confirm</string>
+    <string name="testing">Testing…</string>
+    <string name="waiting_for_network">Waiting for network</string>
+    <string name="sync">Sync</string>
 </resources>

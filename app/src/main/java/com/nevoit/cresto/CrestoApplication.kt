@@ -1,6 +1,7 @@
 package com.nevoit.cresto
 
 import android.app.Application
+import com.nevoit.cresto.data.sync.SyncWorker
 import com.nevoit.cresto.data.todo.appModule
 import com.nevoit.cresto.data.todo.reminder.TodoReminderNotifications
 import com.nevoit.cresto.feature.shareextract.ShareExtractNotifications
@@ -29,5 +30,7 @@ class CrestoApplication : Application() {
 
             modules(appModule)
         }
+        // Register background WebDAV sync (periodic + network recovery)
+        SyncWorker.register(this)
     }
 }
